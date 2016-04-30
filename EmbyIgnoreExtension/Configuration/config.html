@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Ignore Extensions</title>
+</head>
+<body>
+    <div data-role="page" class="page type-interior pluginConfigurationPage ignExtConfigurationPage">
+
+        <div data-role="content">
+            <div class="content-primary">
+
+                <form class="ignExtConfigurationForm">
+
+                    <ul class="ulForm" data-role="listview">
+
+                        <li>
+                            <label for="txtExtensions">
+                                Extensions to ignore:
+                            </label>
+                            <input type="text" id="txtExtensions" name="txtExtensions"/>
+                            <div class="fieldDescription">
+                                Comma-seperated list of file extensions to ignore.
+                            </div>
+                        </li>
+                        <li>
+                            <button type="submit" data-theme="b">Save</button>
+                            <button type="button" onclick="history.back();">Cancel</button>
+                        </li>
+
+                    </ul>
+
+                </form>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var ignExtConfigurationPage = {
+                pluginUniqueId: "76cf3f5c-fb25-4dc5-bd7f-e3d2844f5b41"
+            };
+
+
+            $('.ignExtConfigurationPage').on('pageshow', function (event) {
+
+                Dashboard.showLoadingMsg();
+
+                var page = this;
+
+                ApiClient.getPluginConfiguration(ignExtConfigurationPage.pluginUniqueId).then(function (config) {
+
+                    $('#txtExtensions', page).val(config.IgnoredExtensions || "");
+
+                    Dashboard.hideLoadingMsg();
+                });
+            });
+
+
+
+            $('.ignExtConfigurationForm').on('submit', function (e) {
+
+                Dashboard.showLoadingMsg();
+
+                var form = this;
+
+                ApiClient.getPluginConfiguration(ignExtConfigurationPage.pluginUniqueId).then(function (config) {
+
+                    config.IgnoredExtensions = $('#txtExtensions', form).val();
+
+                    ApiClient.updatePluginConfiguration(ignExtConfigurationPage.pluginUniqueId, config).then(Dashboard.processPluginConfigurationUpdateResult);
+                });
+
+                // Disable default form submission
+                return false;
+            });
+
+        </script>
+    </div>
+</body>
+</html>
